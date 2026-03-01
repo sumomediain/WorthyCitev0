@@ -127,7 +127,7 @@ export default function EditorPage() {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `citecore_optimized_${pageId}.docx`;
+                a.download = `worthycite_optimized_${pageId}.docx`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);

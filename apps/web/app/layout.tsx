@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CiteCore SaaS - GEO & SEO Optimization",
+  title: "WorthyCite SaaS - GEO & SEO Optimization",
   description: "AI-powered content optimization platform",
 };
 

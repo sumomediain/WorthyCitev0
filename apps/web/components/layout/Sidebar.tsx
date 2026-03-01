@@ -35,7 +35,7 @@ export function Sidebar() {
         <aside className="w-64 border-r bg-muted/40 hidden md:flex flex-col">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
                 <Link href="/" className="flex items-center gap-2 font-semibold">
-                    <span className="text-primary text-xl font-bold">CiteCore</span>
+                    <span className="text-primary text-xl font-bold">WorthyCite</span>
                 </Link>
             </div>
 

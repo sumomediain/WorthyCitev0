@@ -41,6 +41,6 @@ app.get("/api/health", (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-    console.log(`CiteCore API is running on port ${port}`);
+    console.log(`WorthyCite API is running on port ${port}`);
 });
 // Nodemon restart trigger

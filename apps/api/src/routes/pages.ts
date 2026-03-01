@@ -3,7 +3,7 @@ import { ContentPage } from "../models/ContentPage";
 import { ContentVersion } from "../models/ContentVersion";
 import { Project } from "../models/Project";
 import jwt from "jsonwebtoken";
-import { validateAndSanitizeContent } from "../lib/citecore-validator";
+import { validateAndSanitizeContent } from "../lib/worthycite-validator";
 import { deductOptimizationCredit } from "./billing";
 import { optimizationQueue } from "../queues/optimizationQueue";
 import { runOptimizationLogic } from "../lib/optimization";
@@ -125,7 +125,7 @@ router.get("/:pageId", async (req: Request, res: Response) => {
     }
 });
 
-// CiteCore Orchestrator Endpoint
+// WorthyCite Orchestrator Endpoint
 // Atomically deducts a credit and enqueues the AI pipeline
 router.post("/:pageId/optimize", async (req: Request, res: Response) => {
     try {
@@ -139,7 +139,7 @@ router.post("/:pageId/optimize", async (req: Request, res: Response) => {
             return res.status(404).json({ success: false, error: { message: "Content page not found" } });
         }
 
-        // CiteCore Pre-Flight Validation (Stage 1)
+        // WorthyCite Pre-Flight Validation (Stage 1)
         const validation = validateAndSanitizeContent(draftContent);
         if (!validation.isValid) {
             return res.status(422).json({ success: false, error: { message: "Validation failed", details: validation.errors } });
@@ -259,7 +259,7 @@ router.get("/:pageId/export", async (req: Request, res: Response) => {
         const buffer = await Packer.toBuffer(doc);
         const sanitizeFilename = page.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-        res.setHeader("Content-Disposition", `attachment; filename=citecore_${sanitizeFilename}.docx`);
+        res.setHeader("Content-Disposition", `attachment; filename=worthycite_${sanitizeFilename}.docx`);
         res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         res.send(buffer);
 

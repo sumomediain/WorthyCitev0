@@ -1,0 +1,112 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model User {
+    id           String         @id @default(uuid())
+    name         String
+    email        String         @unique
+    passwordHash String
+    status       String         @default("active") // "active", "blocked"
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    
+    // Relations
+    projects      Project[]
+    contentPages  ContentPage[]
+    versions      ContentVersion[]
+    wallets       Wallet[]
+    creditLedgers CreditLedger[]
+}
+
+model Project {
+    id          String        @id @default(uuid())
+    userId      String
+    name        String
+    description String?       @default("")
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+
+    // Relations
+    user        User          @relation(fields: [userId], references: [id])
+    contentPages ContentPage[]
+
+    @@index([userId, createdAt(sort: Desc)])
+}
+
+model ContentPage {
+    id        String   @id @default(uuid())
+    userId    String
+    projectId String
+    title     String
+    slug      String
+    status    String   @default("draft") // "draft", "submitted", "optimized", "failed", "archived"
+    monthKey  String   // Format: YYYY-MM
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    user     User             @relation(fields: [userId], references: [id])
+    project  Project          @relation(fields: [projectId], references: [id])
+    versions ContentVersion[]
+
+    @@index([userId, monthKey, createdAt(sort: Desc)])
+    @@index([projectId, createdAt(sort: Desc)])
+}
+
+model ContentVersion {
+    id            String   @id @default(uuid())
+    contentPageId String
+    userId        String
+    type          String   // "user_input", "optimized", "edited"
+    body          String?  @default("")
+    meta          Json?    @default("{}") // Title, SEO descriptions, etc.
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    // Relations
+    contentPage ContentPage @relation(fields: [contentPageId], references: [id])
+    user        User        @relation(fields: [userId], references: [id])
+
+    @@index([contentPageId, createdAt(sort: Desc)])
+}
+
+model Wallet {
+    id        String   @id @default(uuid())
+    userId    String
+    monthKey  String   // Format: YYYY-MM
+    balance   Int      @default(50) // Assuming credits are integers
+    plan      String   @default("base") // "base", "pro", "enterprise"
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    user          User           @relation(fields: [userId], references: [id])
+    creditLedgers CreditLedger[]
+
+    @@unique([userId, monthKey])
+}
+
+model CreditLedger {
+    id              String   @id @default(uuid())
+    userId          String
+    walletId        String
+    amount          Int      // Positive (refunds/grants) or Negative (usage)
+    type            String   // "monthly_grant", "optimization_usage", "refund", etc.
+    description     String
+    relatedEntityId String?  // e.g. ContentPage / Job ID
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    // Relations
+    user   User   @relation(fields: [userId], references: [id])
+    wallet Wallet @relation(fields: [walletId], references: [id])
+
+    @@index([userId, createdAt(sort: Desc)])
+    @@index([walletId])
+    @@index([relatedEntityId])
+}
